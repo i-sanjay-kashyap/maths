@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin: 50px;
+        background-color: #f4f4f4;
+      }
+
+      h1 {
+        color: #333;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 10px;
+      }
+
+      input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 20px;
+        box-sizing: border-box;
+      }
+
+      button {
+        padding: 10px 20px;
+        cursor: pointer;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+        display: inline-block;
+      }
+
+      button:hover {
+        background-color: #45a049;
+      }
+
+      .box {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 20px;
+        margin-top: 20px;
+        text-align: left;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      p {
+        margin: 10px 0;
+        color: #333;
+      }
+
+      .calculation {
+        font-weight: bold;
+      }
+
+      .intermediate-step {
+        color: #666;
+        margin: 5px 0;
+      }
+
+      canvas {
+        margin-top: 20px;
+      }
+    </style>
+    <title>Probability and Statistics Calculator</title>
+  </head>
+  <body>
+    <h1>Probability and Statistics Calculator</h1>
+
+    <label for="pA">Enter P(A):</label>
+    <input type="number" id="pA" step="0.01" placeholder="0.5" />
+
+    <label for="pB">Enter P(B):</label>
+    <input type="number" id="pB" step="0.01" placeholder="0.8" />
+
+    <button onclick="calculateProbability()">Calculate Probability</button>
+
+    <label for="dataPoints">Enter Data Points (comma-separated):</label>
+    <input type="text" id="dataPoints" placeholder="e.g., 10, 20, 30, 40" />
+
+    <button onclick="calculateStatistics()">Calculate Statistics</button>
+
+    <div class="box" id="resultContainer">
+      <!-- Probability results -->
+      <div id="probabilityResults" style="display: none">
+        <h2>Probability Results</h2>
+        <p class="calculation">P(A) = <span id="pAValue"></span></p>
+        <p class="calculation">P(B) = <span id="pBValue"></span></p>
+        <p class="intermediate-step">P(A ∩ B) = P(A) * P(B)</p>
+        <p class="calculation">P(A ∩ B) = <span id="pIntersection"></span></p>
+        <p class="intermediate-step">P(A ∪ B) = P(A) + P(B) - P(A ∩ B)</p>
+        <p class="calculation">P(A ∪ B) = <span id="pUnion"></span></p>
+        <p class="intermediate-step">P(A Δ B) = P(A) + P(B) - 2 * P(A ∩ B)</p>
+        <p class="calculation">
+          P(A Δ B) = <span id="pSymmetricDifference"></span>
+        </p>
+        <p class="intermediate-step">P(A') = 1 - P(A)</p>
+        <p class="calculation">P(A') = <span id="pAComplement"></span></p>
+        <p class="intermediate-step">P(B') = 1 - P(B)</p>
+        <p class="calculation">P(B') = <span id="pBComplement"></span></p>
+        <p class="intermediate-step">P((A ∪ B)') = 1 - P(A ∪ B)</p>
+        <p class="calculation">
+          P((A ∪ B)') = <span id="pComplementUnion"></span>
+        </p>
+      </div>
+
+      <!-- Statistics results -->
+      <div id="statisticsResults" style="display: none">
+        <h2>Statistics Results</h2>
+        <p class="intermediate-step">Mean Calculation:</p>
+        <p class="calculation">Mean: <span id="meanValue"></span></p>
+        <p class="intermediate-step">Median Calculation:</p>
+        <p class="calculation">Median: <span id="medianValue"></span></p>
+        <p class="intermediate-step">Mode Calculation:</p>
+        <p class="calculation">Mode: <span id="modeValue"></span></p>
+        <p class="intermediate-step">Variance Calculation:</p>
+        <p class="calculation">Variance: <span id="varianceValue"></span></p>
+        <p class="intermediate-step">Standard Deviation Calculation:</p>
+        <p class="calculation">
+          Standard Deviation: <span id="stdDeviationValue"></span>
+        </p>
+      </div>
+
+      <canvas id="chart" style="display: none"></canvas>
+    </div>
+
+    <script>
+      function calculateProbability() {
+        // Get input values for probability
+        const pA = parseFloat(document.getElementById("pA").value) || 0.0;
+        const pB = parseFloat(document.getElementById("pB").value) || 0.0;
+
+        // Calculate probability results
+        const pIntersection = (pA * pB).toFixed(2);
+        const pUnion = (pA + pB - pIntersection).toFixed(2);
+        const pSymmetricDifference = (pA + pB - 2 * pIntersection).toFixed(2);
+        const pAComplement = (1 - pA).toFixed(2);
+        const pBComplement = (1 - pB).toFixed(2);
+        const pComplementUnion = (1 - pUnion).toFixed(2);
+
+        // Display probability results
+        document.getElementById("pAValue").textContent = pA;
+        document.getElementById("pBValue").textContent = pB;
+        document.getElementById("pIntersection").textContent = pIntersection;
+        document.getElementById("pUnion").textContent = pUnion;
+        document.getElementById("pSymmetricDifference").textContent =
+          pSymmetricDifference;
+        document.getElementById("pAComplement").textContent = pAComplement;
+        document.getElementById("pBComplement").textContent = pBComplement;
+        document.getElementById("pComplementUnion").textContent =
+          pComplementUnion;
+
+        // Show probability results and hide statistics results
+        document.getElementById("probabilityResults").style.display = "block";
+        document.getElementById("statisticsResults").style.display = "none";
+
+        // Hide the chart
+        document.getElementById("chart").style.display = "none";
+      }
+
+      function calculateStandardDeviation(dataPoints, mean) {
+        const squaredDifferences = dataPoints.map((num) => (num - mean) ** 2);
+        const variance =
+          squaredDifferences.reduce(
+            (sum, squaredDiff) => sum + squaredDiff,
+            0
+          ) / dataPoints.length;
+        return Math.sqrt(variance);
+      }
+
+      function calculateStatistics() {
+        // Get input values for statistics
+        const dataPointsInput = document.getElementById("dataPoints").value;
+        const dataPoints = dataPointsInput
+          .split(",")
+          .map((point) => parseFloat(point.trim()))
+          .filter((point) => !isNaN(point));
+
+        // Calculate statistics results
+        const mean = calculateMean(dataPoints);
+        const median = calculateMedian(dataPoints);
+        const mode = calculateMode(dataPoints);
+        const variance = calculateVariance(dataPoints, mean);
+        const stdDeviation = calculateStandardDeviation(dataPoints, mean);
+
+        // Display statistics results
+        document.getElementById("meanValue").textContent = mean.toFixed(2);
+        document.getElementById("medianValue").textContent = median.toFixed(2);
+        document.getElementById("modeValue").textContent = mode.join(", ");
+        document.getElementById("varianceValue").textContent =
+          variance.toFixed(2);
+        document.getElementById("stdDeviationValue").textContent =
+          stdDeviation.toFixed(2);
+
+        // Show statistics results and hide probability results
+        document.getElementById("probabilityResults").style.display = "none";
+        document.getElementById("statisticsResults").style.display = "block";
+
+        // Show the chart
+        document.getElementById("chart").style.display = "block";
+
+        // Create a bar chart
+        const ctx = document.getElementById("chart").getContext("2d");
+        const chart = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: ["Mean", "Median", "Mode", "Variance", "Std Deviation"],
+            datasets: [
+              {
+                label: "Values",
+                data: [mean, median, mode[0], variance, stdDeviation],
+                backgroundColor: [
+                  "rgba(255, 99, 132, 0.2)",
+                  "rgba(54, 162, 235, 0.2)",
+                  "rgba(255, 206, 86, 0.2)",
+                  "rgba(75, 192, 192, 0.2)",
+                  "rgba(153, 102, 255, 0.2)",
+                ],
+                borderColor: [
+                  "rgba(255, 99, 132, 1)",
+                  "rgba(54, 162, 235, 1)",
+                  "rgba(255, 206, 86, 1)",
+                  "rgba(75, 192, 192, 1)",
+                  "rgba(153, 102, 255, 1)",
+                ],
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true,
+              },
+            },
+          },
+        });
+      }
+
+      function calculateMean(dataPoints) {
+        return (
+          dataPoints.reduce((sum, num) => sum + num, 0) / dataPoints.length
+        );
+      }
+
+      function calculateMedian(dataPoints) {
+        const sortedDataPoints = [...dataPoints].sort((a, b) => a - b);
+        const mid = Math.floor(sortedDataPoints.length / 2);
+        return sortedDataPoints.length % 2 === 0
+          ? (sortedDataPoints[mid - 1] + sortedDataPoints[mid]) / 2
+          : sortedDataPoints[mid];
+      }
+
+      function calculateMode(dataPoints) {
+        const frequencyMap = {};
+        dataPoints.forEach((num) => {
+          frequencyMap[num] = (frequencyMap[num] || 0) + 1;
+        });
+
+        let mode = [];
+        let maxFrequency = 0;
+
+        for (const num in frequencyMap) {
+          if (frequencyMap[num] > maxFrequency) {
+            maxFrequency = frequencyMap[num];
+            mode = [num];
+          } else if (frequencyMap[num] === maxFrequency) {
+            mode.push(num);
+          }
+        }
+
+        return mode;
+      }
+
+      function calculateVariance(dataPoints, mean) {
+        return (
+          dataPoints.reduce((sum, num) => sum + (num - mean) ** 2, 0) /
+          dataPoints.length
+        );
+      }
+    </script>
+  </body>
+</html>
